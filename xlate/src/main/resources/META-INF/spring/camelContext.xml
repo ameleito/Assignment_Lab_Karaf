@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xmlns:osgi="http://www.springframework.org/schema/osgi"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd   http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+    <bean
+        class="org.apache.camel.dataformat.soap.name.ServiceInterfaceStrategy" id="serviceStrategy">
+        <constructor-arg value="com.sun.mdm.index.webservice.PersonEJB"/>
+        <constructor-arg value="true"/>
+    </bean>
+    <bean class="org.apache.activemq.ActiveMQConnectionFactory" id="connectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+        <property name="userName" value="amqadmin"/>
+        <property name="password" value="r3dh4t"/>
+    </bean>
+    <!-- Pooled Connection Factory -->
+    <bean class="org.apache.activemq.pool.PooledConnectionFactory" id="pooledConnectionFactory">
+        <!--  A maximum of 10 connections can be opened on high volume -->
+        <property name="maxConnections" value="10"/>
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+    <bean class="org.apache.camel.component.jms.JmsConfiguration" id="jmsConfiguration">
+        <property name="connectionFactory" ref="pooledConnectionFactory"/>
+        <property name="transacted" value="false"/>
+        <!--  It will start at 3 parallel consumers -->
+        <property name="concurrentConsumers" value="3"/>
+        <!--  Once all the messages are sent or received, the client send
+		 acknowledgement to activemq -->
+        <property name="acknowledgementModeName" value="AUTO_ACKNOWLEDGE"/>
+    </bean>
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemqSimple"/>
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemqPool">
+        <property name="configuration" ref="jmsConfiguration"/>
+    </bean>
+    <bean class="com.redhat.customer.translate.TransformToExecuteMatch" id="transformToExecuteMatch"/>
+    <!-- This reference just lets all of our routes use the same
+  connection pool set up in the mq-service project-->
+    <osgi:reference id="activemqService" interface="org.apache.camel.Component"/>
+    <camelContext id="xlatePerson" trace="false"
+        typeConverterStatisticsEnabled="true" xmlns="http://camel.apache.org/schema/spring">
+        <dataFormats>
+            <soapjaxb contextPath="com.sun.mdm.index.webservice"
+                elementNameStrategyRef="serviceStrategy" id="nextgateFormat"/>
+            <jaxb contextPath="com.customer.app" id="personFormat" partClass="com.customer.app.Persons"/>
+            <jaxb contextPath="com.sun.mdm.index.webservice"
+                id="executeMatchFormat" partClass="com.sun.mdm.index.webservice.ExecuteMatchUpdate"/>
+        </dataFormats>
+        <onException id="exception">
+            <description>Exception for errors in conversion</description>
+            <exception>org.apache.camel.TypeConversionException</exception>
+            <redeliveryPolicy maximumRedeliveries="3"
+                redeliveryDelay="3000" retryAttemptedLogLevel="INFO"/>
+            <handled>
+                <simple>true</simple>
+            </handled>
+            <log loggingLevel="ERROR" message="${exception.stacktrace}"/>
+            <to uri="direct:sendToJMS"/>
+        </onException>
+        <route id="translate">
+            <from id="_from1" uri="activemqSimple:queue.person.deim.in"/>
+            <unmarshal id="_unmarshal1" ref="personFormat"/>
+            <split id="_split1">
+                <simple>${body.getPersons()}</simple>
+                <bean id="_bean1" method="convertTo" ref="transformToExecuteMatch"/>
+                <log id="_log2" loggingLevel="INFO" message="This is the body after convert ${body.class}"/>
+                <marshal id="_marshal1" ref="executeMatchFormat"/>
+                <to id="_to1" uri="activemqSimple:queue.person.nextgate.out"/>
+            </split>
+            <log id="_log2" loggingLevel="INFO" message="This is the body after marshall ${body.class}"/>
+        </route>
+        <route id="sendToJMS">
+            <from id="_from2" uri="direct:sendToJMS"/>
+            <to id="_to2" uri="activemqSimple:queue.person.transform.dlq"/>
+        </route>
+    </camelContext>
+</beans>
