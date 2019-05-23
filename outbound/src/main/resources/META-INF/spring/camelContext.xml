@@ -25,7 +25,7 @@
         <route id="sendToNextGate" streamCache="true">
             <from id="_from1" uri="activemqService:queue.person.nextgate.out"/>
             <unmarshal id="_unmarshal1" ref="executeMatchFormat"/>
-            <to id="_to1" uri="cxf://http://localhost:8182/cxf/PersonEJBService/PersonEJB?serviceClass=com.sun.mdm.index.webservice.PersonEJB&amp;dataFormat=MESSAGE"/>
+            <to id="_to1" uri="cxf://http://localhost:8181/cxf/PersonEJBService/PersonEJB?serviceClass=com.sun.mdm.index.webservice.PersonEJB&amp;dataFormat=MESSAGE"/>
         </route>
         <route id="sendToJMS">
             <from id="_from2" uri="direct:sendToJMS"/>
