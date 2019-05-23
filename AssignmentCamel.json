@@ -1,0 +1,60 @@
+{
+	"info": {
+		"_postman_id": "ff1ae540-0992-41d6-b535-38279bef0fc7",
+		"name": "AssignmentCamel",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "PostSendData",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/plain"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"person\":\"John\" }\n\n{\n\t\"persons\":\n\t[\n\t\t\"person\":\n\t\t{\n\t\t\t\"gender\":\n\t\t\t{\n\t\t\t\t\"code\":\"xcode\",\n\t\t\t\t\"value\":\"value\"\n\t\t\t},\n\t\t\t\"legalname\":\n\t\t\t{\n\t\t\t\t\"given\":\"given\",\n\t\t\t\t\"privated\":\"privated\"\n\t\t\t},\n\t\t\t\"fathername\":\"fathername\"\n\t\t}\n\t]\n}"
+				},
+				"url": {
+					"raw": "localhost:8085/deimservice/service/add",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"deimservice",
+						"service",
+						"add"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "80212860-6605-4144-a4bf-e7638c94e2e9",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "81faf2e6-04bd-4248-a182-9aafbc923099",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
