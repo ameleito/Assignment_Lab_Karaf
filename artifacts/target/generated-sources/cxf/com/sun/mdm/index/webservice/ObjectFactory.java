@@ -1562,12 +1562,8 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}
+     * Create an instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}}
      * 
-     * @param value
-     *     Java instance representing xml element's value.
-     * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link byte[]}{@code >}
      */
     @XmlElementDecl(namespace = "", name = "return", scope = LookupResourceResponse.class)
     public JAXBElement<byte[]> createLookupResourceResponseReturn(byte[] value) {

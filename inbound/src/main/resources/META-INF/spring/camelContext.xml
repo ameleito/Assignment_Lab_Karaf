@@ -1,95 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:camel="http://camel.apache.org/schema/spring"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-    xmlns:osgi="http://www.springframework.org/schema/osgi"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd   http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd   http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-    <!-- This reference just lets all of our routes use the same
-  connection pool set up in the mq-service project -->
-    <osgi:reference id="activemqService" interface="org.apache.camel.Component"/>
-    <bean class="com.redhat.usecase.service.impl.DEIMServiceImpl" id="demographicImpl"/>
-    <jaxrs:server address="http://localhost:9098/cxf/demos" id="demoGraphicsService">
-        <jaxrs:serviceBeans>
-            <ref bean="demographicImpl"/>
-        </jaxrs:serviceBeans>
-    </jaxrs:server>
-    <camelContext id="inboundRest" trace="false" xmlns="http://camel.apache.org/schema/spring">
-        <dataFormats>
-            <jaxb contextPath="com.customer.app" id="personFormat" partClass="com.customer.app.Person"/>
-        </dataFormats>
-        <!-- this is the route called by DEIMServiceImpl -->
-                <restConfiguration bindingMode="off" component="servlet"
-            contextPath="/rest" host="localhost" port="8181"/>
-        <rest apiDocs="true" consumes="application/json"
-            enableCORS="true"
-            id="rest-fba86e71-44f3-46c1-a71c-f311edfa9d05"
-            path="/account" produces="application/json">
-            <post id="41f43632-5d15-49a1-9d54-0495fbc269d4" uri="/service">
-                <to id="_to12" uri="direct:usecase"/>
-            </post>
-        </rest>
-        <route id="_route3">
-            <from id="_from3" uri="direct:usecase"/>
-            <convertBodyTo id="_convertBodyTo1" type="String"/>
-            <multicast id="_multicast1" parallelProcessing="true" strategyRef="reconcileData">
-                <log id="_log2" loggingLevel="INFO" message="inside multicast"/>
-                <to id="_to4" uri="direct://callRestEndpoint"/>
-                <to id="_to5" uri="direct://callWSEndpoint"/>
-            </multicast>
-            <log id="_log8" loggingLevel="INFO" message="after multicast : ${body}"/>
-            <to id="_to6" uri="direct:insertDB"/>
-        </route>
-        <!-- Call WebService Client -->
-        <route id="_route5">
-            <from id="_from5" uri="direct://callWSEndpoint"/>
-            <log id="_log12" message="In the SOAP service request: ${body}"/>
-            <unmarshal id="_unmarshal1">
-                <json library="Jackson" unmarshalTypeName="org.globex.Account"/>
-            </unmarshal>
-            <to id="_to7" uri="cxf:bean:customerWebService"/>
-            <log id="_log10" loggingLevel="INFO" message=">> WebService Response : ${body[0].id}, ${body[0].salesContact}, ${body[0].company.geo}, ${body[0].contact.firstName}, ${body[0].contact.lastName} "/>
-        </route>
-        <!-- Call REST Client -->
-        <route id="_route6">
-            <from id="_from6" uri="direct://callRestEndpoint"/>
-            <onException id="_onException2">
-                <exception>java.lang.Exception</exception>
-                <redeliveryPolicy maximumRedeliveries="1"/>
-                <handled>
-                    <constant>true</constant>
-                </handled>
-                <log id="_log3" message=">> Error : ${exception.message}, ${exception.stacktrace}"/>
-            </onException>
-            <setHeader headerName="Content-Type" id="_setHeader1">
-                <constant>application/json</constant>
-            </setHeader>
-            <setHeader headerName="Accept" id="_setHeader2">
-                <constant>application/json</constant>
-            </setHeader>
-            <setHeader headerName="CamelHttpMethod" id="_setHeader3">
-                <constant>POST</constant>
-            </setHeader>
-            <setHeader headerName="originalBody" id="_setHeader4">
-                <simple>${body}</simple>
-            </setHeader>
-            <setHeader headerName="CamelHttpUri" id="_setHeader5">
-                <simple>{{camel.rest.backend.host}}/rest/customerservice/enrich</simple>
-            </setHeader>
-            <log id="_log4" message=">> Before calling restClient : ${body}"/>
-            <to id="_to8" uri="http4://restClient"/>
-            <unmarshal id="_unmarshal2">
-                <json library="Jackson" unmarshalTypeName="org.globex.Account"/>
-            </unmarshal>
-            <log id="_log6" message=">> REST Response : ${body}"/>
-        </route>
-        <!-- Insert Records -->
-        <route id="_route7">
-            <from id="_from7" uri="direct:insertDB"/>
-            <log id="_log11" message=">> Before Insert : ${body}"/>
-            <bean id="_bean3" method="defineNamedParameters" ref="processorBean"/>
-            <to id="_to9" uri="sql:INSERT INTO USECASE.T_ACCOUNT(CLIENT_ID,SALES_CONTACT,COMPANY_NAME,COMPANY_GEO,COMPANY_ACTIVE,CONTACT_FIRST_NAME,CONTACT_LAST_NAME,CONTACT_ADDRESS,CONTACT_CITY,CONTACT_STATE,CONTACT_ZIP,CONTACT_PHONE,CREATION_DATE,CREATION_USER)                          VALUES                          (:#CLIENT_ID,:#SALES_CONTACT,:#COMPANY_NAME,:#COMPANY_GEO,:#COMPANY_ACTIVE,:#CONTACT_FIRST_NAME,:#CONTACT_LAST_NAME,:#CONTACT_ADDRESS,:#CONTACT_CITY,:#CONTACT_STATE,:#CONTACT_ZIP,:#CONTACT_PHONE,:#CREATION_DATE,:#CREATION_USER);"/>
-            <log id="_log7" message=">>> Results : ${body}"/>
-        </route>
-    </camelContext>
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd   http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd   http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- This reference just lets all of our routes use the same connection 
+		pool set up in the mq-service project -->
+	<osgi:reference id="activemqService"
+		interface="org.apache.camel.Component" />
+	<bean class="com.redhat.usecase.service.impl.DEIMServiceImpl"
+		id="demographicImpl" />
+	<jaxrs:server address="http://localhost:9098/cxf/demos"
+		id="demoGraphicsService">
+		<jaxrs:serviceBeans>
+			<ref bean="demographicImpl" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+	<camelContext id="inboundRest" trace="false"
+		xmlns="http://camel.apache.org/schema/spring">
+		<dataFormats>
+			<xmljson id="xmljson" />
+			<xmljson elementName="person" encoding="UTF-8"
+				expandableProperties="d e" forceTopLevelObject="true"
+				id="xmljsonWithOptions" removeNamespacePrefixes="true" 
+				rootName="person" skipNamespaces="true" trimSpaces="true" />
+		</dataFormats>
+		<!-- this is the route called by DEIMServiceImpl -->
+		<!-- Here we receive the object will be send it to teh route, the reoute 
+			will be send it to amq. -->
+		<restConfiguration host="localhost" port="8085"
+			contextPath="/deimservice" bindingMode="off" component="restlet" />
+		<rest path="/service" >
+			<post consumes="application/json"
+				id="post-563ad899-8f6e-493c-92bc-7b185364aeb2"
+				produces="application/json" uri="/add">
+				<to uri="direct:deimInternal" />
+			</post>
+			<post consumes="application/json"
+				id="post-908a6643-73e8-4a20-b817-d544a465a18d" uri="/update">
+				<to uri="direct:deimInternal" />
+			</post>
+			<post consumes="application/json"
+				id="post-02aa50cb-07ae-4115-9755-e32a3ad2ad7c" uri="/search">
+				<to uri="direct:deimInternal" />
+			</post>
+		</rest>
+		<route id="handleRest">
+			<from id="_from1" uri="direct:deimInternal" />
+			<convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
+			<log id="_log2" loggingLevel="INFO"
+				message="This is the body after convert ${body}" />
+			<to id="_to1" uri="direct:unmarshalWithOptions" />
+			<to id="_to3" uri="direct:sendDataAmq" />
+			<log id="_log1" loggingLevel="INFO" message="updateAccount" />
+		</route>
+		<route id="_route1">
+			<from id="_from2" uri="direct:unmarshalWithOptions" />
+			<unmarshal id="_unmarshal1" ref="xmljsonWithOptions" />
+		</route>
+		<route id="_route2">
+			<from id="_from3" uri="direct:marshalWithOptions" />
+			<marshal id="_marshal1" ref="xmljson" />
+		</route>
+		<route id="_route3">
+			<from id="_from4" uri="direct:sendDataAmq" />
+			<log id="_log3" loggingLevel="INFO"
+				message="This is the body convert ${body}" />
+			<inOnly id="_to2" uri="activemqService:queue.person.deim.in" />
+			<setBody id="_setBody1">
+				<simple>Done Transformation</simple>
+			</setBody>
+			<log id="_log4" loggingLevel="INFO"
+				message="This is the body after ${body}" />
+		</route>
+	</camelContext>
 </beans>

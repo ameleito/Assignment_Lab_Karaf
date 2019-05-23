@@ -15,6 +15,20 @@
 
   <name>Customer :: Application :: Core :: Artifacts</name>
 
+
+  <dependencies>
+  		<dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.2.5</version>
+        </dependency>
+  </dependencies>
+  
   <build>
     <plugins>
       <plugin>
@@ -111,5 +125,5 @@
       </plugin>
     </plugins>
   </build>
-
+  
 </project>

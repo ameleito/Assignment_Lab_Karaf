@@ -10,8 +10,8 @@
     </bean>
     <bean class="org.apache.activemq.ActiveMQConnectionFactory" id="connectionFactory">
         <property name="brokerURL" value="tcp://localhost:61616"/>
-        <property name="userName" value="amqadmin"/>
-        <property name="password" value="r3dh4t"/>
+        <property name="userName" value="admin"/>
+        <property name="password" value="admin"/>
     </bean>
     <!-- Pooled Connection Factory -->
     <bean class="org.apache.activemq.pool.PooledConnectionFactory" id="pooledConnectionFactory">
@@ -35,13 +35,12 @@
     <bean class="com.redhat.customer.translate.TransformToExecuteMatch" id="transformToExecuteMatch"/>
     <!-- This reference just lets all of our routes use the same
   connection pool set up in the mq-service project-->
-    <osgi:reference id="activemqService" interface="org.apache.camel.Component"/>
     <camelContext id="xlatePerson" trace="false"
         typeConverterStatisticsEnabled="true" xmlns="http://camel.apache.org/schema/spring">
         <dataFormats>
             <soapjaxb contextPath="com.sun.mdm.index.webservice"
                 elementNameStrategyRef="serviceStrategy" id="nextgateFormat"/>
-            <jaxb contextPath="com.customer.app" id="personFormat" partClass="com.customer.app.Persons"/>
+            <jaxb contextPath="com.customer.app" id="personFormat" partClass="com.customer.app.Person"/>
             <jaxb contextPath="com.sun.mdm.index.webservice"
                 id="executeMatchFormat" partClass="com.sun.mdm.index.webservice.ExecuteMatchUpdate"/>
         </dataFormats>
@@ -60,7 +59,7 @@
             <from id="_from1" uri="activemqSimple:queue.person.deim.in"/>
             <unmarshal id="_unmarshal1" ref="personFormat"/>
             <split id="_split1">
-                <simple>${body.getPersons()}</simple>
+                <simple>${body}</simple>
                 <bean id="_bean1" method="convertTo" ref="transformToExecuteMatch"/>
                 <log id="_log2" loggingLevel="INFO" message="This is the body after convert ${body.class}"/>
                 <marshal id="_marshal1" ref="executeMatchFormat"/>
