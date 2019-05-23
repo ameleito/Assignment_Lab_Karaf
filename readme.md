@@ -31,31 +31,23 @@ The other Requirement is have a postman installed to use the request you will fi
 
 <h2>1. cloning</h2>
 
-	Obviously the first option here will be get or clone our repo for this option we need to execute the next command.
+Obviously the first option here will be get or clone our repo for this option we need to execute the next command.
 
 	git clone https://github.com/ameleito/Assignment_Lab_Karaf.git
 
 <h2>2. Import profile </h2>
 
-	To enable the bundles insede fabric we have to follow the next steps.
+To enable the bundles insede fabric we have to follow the next steps.
 
-<<<<<<< HEAD
-	2.1 connect to fabric.
-
-		<FUSE_HOME>/bin/client
-
-	2.2 import profile with command:
-=======
-	<h3>2.1 connect to fabric.</h3>
+2.1 connect to fabric.
 
 		<FUSE_HOME>/bin/client
 
-	<h3>2.2 import profile with command:</h3>
->>>>>>> 2119067736cf9b487ad6696e2a5b29e14c2453fb
+2.2 import profile with command:
 
 		profile-import --version <version_fabric> file:///<Repository_Home>/assigmentLab.zip
 
-		example:
+example:
 
 		profile-import --version 1.0 file:///home/jamezqui/testProject/Assignment_Lab_Karaf/assigmentLab.zip
 
@@ -63,22 +55,18 @@ The other Requirement is have a postman installed to use the request you will fi
 
 		Imported profiles into version 1.0
 
-<<<<<<< HEAD
-	2.3 Verifing the profile in fabric, to do that we will use the command:
-=======
-	<h3>2.3 Verifing the profile in fabric, to do that we will use the command:</h3>
->>>>>>> 2119067736cf9b487ad6696e2a5b29e14c2453fb
+2.3 Verifing the profile in fabric, to do that we will use the command:
 
 		profile-list |grep -i assigmentLab
 
-		the reesult must be something like.
+the reesult must be something like.
 
 		assigmentLab                     1               default feature-camel mq-amq
 
 <h2>3. 	Install the projects inside your maven local repository.</h2>
 
-	We need to create our artifacts inside the repository where fabric load the artifactories, for us is a local maven. we need to execute the command mvn clean install 
-	inside the next projects.
+We need to create our artifacts inside the repository where fabric load the artifactories, for us is a local maven. we need to execute the command mvn clean install 
+inside the next projects.
 
 		artifacts
 		services/mq-service/
@@ -86,44 +74,34 @@ The other Requirement is have a postman installed to use the request you will fi
 		xlate
 		outbound
 
-	when the resource will be enable inside our repository, we will ready to make the deploy.	 
+when the resource will be enable inside our repository, we will ready to make the deploy.	 
 
 <h2>4.  Deploying your profile.</h2>
 
-	When you have your profile inside your fabric and all the projects inside your local repository, it's time to make the link beetwen container and profile this task
-	will validate, will download, and will build the bundles inside the container the commands to do this are:
+When you have your profile inside your fabric and all the projects inside your local repository, it's time to make the link beetwen container and profile this task
+will validate, will download, and will build the bundles inside the container the commands to do this are:
 
-<<<<<<< HEAD
-	4.1 Connect to fabric
+4.1 Connect to fabric
 
-		<FUSE_HOME>/bin/client
+	<FUSE_HOME>/bin/client
 
-	4.2 Assotiate Profile to Container
-
-		container-add-profile root  assigmentLab
-
-	Verifing your assotiation
-=======
-	<h3>4.1 Connect to fabric</h3>
-
-		<FUSE_HOME>/bin/client
-
-	<h3>4.2 Assotiate Profile to Container</h3>
+4.2 Assotiate Profile to Container
 
 		container-add-profile root  assigmentLab
 
-	<h3>Verifing your assotiation</h3>
->>>>>>> 2119067736cf9b487ad6696e2a5b29e14c2453fb
+4.3 Verifing your assotiation
+
+For make the verification you need execute the next commands
 
 		container-list 
 
-		This command show you the result as:
+This command show you the result as:
 
 		 AviancaDev  1.0        karaf   yes          default                 success           
                                               		 assigmentLab                   
 
 
-    In this way we can see the root container AviancaDev with the assigmentLab profile deploy inside the container.
+In this way we can see the root container AviancaDev with the assigmentLab profile deploy inside the container.
 
 <h2>5. Runing the Postman Test </h2>
 
@@ -133,6 +111,5 @@ The other Requirement is have a postman installed to use the request you will fi
 
 <h2>6. Another Works</h2>
 
-	For this course we generated the same routes but for Spring-boot, this routes are available in the next repository
-	<a href="https://github.com/ameleito/Assignment_Lab.git">projects for Spring-boot</a>, you can check them and 
-	make the comments about it.
+For this course we generated the same routes but for Spring-boot, this routes are available in the next repository
+https://github.com/ameleito/Assignment_Lab.git, you can check them and make the comments about it.
