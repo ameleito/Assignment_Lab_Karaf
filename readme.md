@@ -39,19 +39,11 @@ The other Requirement is have a postman installed to use the request you will fi
 
 	To enable the bundles insede fabric we have to follow the next steps.
 
-<<<<<<< HEAD
 	2.1 connect to fabric.
 
 		<FUSE_HOME>/bin/client
 
 	2.2 import profile with command:
-=======
-	<h3>2.1 connect to fabric.</h3>
-
-		<FUSE_HOME>/bin/client
-
-	<h3>2.2 import profile with command:</h3>
->>>>>>> 2119067736cf9b487ad6696e2a5b29e14c2453fb
 
 		profile-import --version <version_fabric> file:///<Repository_Home>/assigmentLab.zip
 
@@ -63,11 +55,7 @@ The other Requirement is have a postman installed to use the request you will fi
 
 		Imported profiles into version 1.0
 
-<<<<<<< HEAD
 	2.3 Verifing the profile in fabric, to do that we will use the command:
-=======
-	<h3>2.3 Verifing the profile in fabric, to do that we will use the command:</h3>
->>>>>>> 2119067736cf9b487ad6696e2a5b29e14c2453fb
 
 		profile-list |grep -i assigmentLab
 
@@ -93,7 +81,6 @@ The other Requirement is have a postman installed to use the request you will fi
 	When you have your profile inside your fabric and all the projects inside your local repository, it's time to make the link beetwen container and profile this task
 	will validate, will download, and will build the bundles inside the container the commands to do this are:
 
-<<<<<<< HEAD
 	4.1 Connect to fabric
 
 		<FUSE_HOME>/bin/client
@@ -102,18 +89,7 @@ The other Requirement is have a postman installed to use the request you will fi
 
 		container-add-profile root  assigmentLab
 
-	Verifing your assotiation
-=======
-	<h3>4.1 Connect to fabric</h3>
-
-		<FUSE_HOME>/bin/client
-
-	<h3>4.2 Assotiate Profile to Container</h3>
-
-		container-add-profile root  assigmentLab
-
-	<h3>Verifing your assotiation</h3>
->>>>>>> 2119067736cf9b487ad6696e2a5b29e14c2453fb
+	4.3 Verifing your assotiation
 
 		container-list 
 
